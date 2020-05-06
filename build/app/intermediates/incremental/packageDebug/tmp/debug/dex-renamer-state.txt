@@ -1,0 +1,4 @@
+#Wed May 06 17:13:30 PKT 2020
+base.0=/Users/baqir/Sites/flutter-session-assignments/whatsapp_ui/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
