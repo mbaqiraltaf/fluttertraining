@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/baqir/Sites/flutter-session-assignments/whatsapp_ui/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
+            "outputFile": "/Users/baqir/Sites/flutter-session-assignments/todo_app/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
             "map": [
                 {
                     "source": "/Users/baqir/.gradle/caches/transforms-2/files-2.1/ae13efc3dbae5c9ee58d4933337fcd21/coordinatorlayout-1.0.0/res/values/values.xml",
@@ -42,7 +42,7 @@
                     }
                 },
                 {
-                    "source": "/Users/baqir/Sites/flutter-session-assignments/whatsapp_ui/android/app/src/main/res/values/styles.xml",
+                    "source": "/Users/baqir/Sites/flutter-session-assignments/todo_app/android/app/src/main/res/values/styles.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

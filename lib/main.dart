@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'pages/homepage.dart';
+import 'pages/todoformpage.dart';
+import 'package:provider/provider.dart';
+import 'TodoModel.dart';
 
-import 'homepage.dart';
-
-void main() => runApp(MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => TodoModel(),
+      child: MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -22,7 +31,14 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      //home: MyHomePage(),
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => MyHomePage(),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/add-todo': (context) => TodoFormPage(),
+      },
     );
   }
 }
