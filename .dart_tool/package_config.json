@@ -104,6 +104,12 @@
       "languageVersion": "2.4"
     },
     {
+      "name": "provider",
+      "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/provider-3.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    },
+    {
       "name": "quiver",
       "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/quiver-2.0.5",
       "packageUri": "lib/",
@@ -170,13 +176,13 @@
       "languageVersion": "2.3"
     },
     {
-      "name": "whatsapp_ui",
+      "name": "todo_app",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.1"
     }
   ],
-  "generated": "2020-05-06T12:19:42.549554Z",
+  "generated": "2020-05-18T07:20:40.290860Z",
   "generator": "pub",
   "generatorVersion": "2.7.2"
 }
