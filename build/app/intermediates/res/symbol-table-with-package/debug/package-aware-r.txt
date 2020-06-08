@@ -1,4 +1,4 @@
-com.example.weather_app
+com.example.favourites_app
 attr alpha
 attr coordinatorLayoutStyle
 attr font

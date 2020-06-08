@@ -194,13 +194,13 @@
       "languageVersion": "2.3"
     },
     {
-      "name": "weather_app",
+      "name": "favourites_app",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.1"
     }
   ],
-  "generated": "2020-06-08T14:09:27.271375Z",
+  "generated": "2020-06-08T14:22:44.973732Z",
   "generator": "pub",
   "generatorVersion": "2.7.2"
 }

@@ -14,7 +14,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   Future<Database> openConnection() async {
     return openDatabase(
-        join(await getDatabasesPath(), 'suggestions_database_22.db'),
+        join(await getDatabasesPath(), 'suggestions_database_21.db'),
         version: 1, onCreate: (db, version) {
       db.execute(
           "CREATE TABLE suggestions(id INTEGER PRIMARY KEY, name TEXT, isFavourite INTEGER)");

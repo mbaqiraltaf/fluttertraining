@@ -1,6 +1,6 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.example.weather_app"
+3    package="com.example.favourites_app"
 4    android:versionCode="1"
 5    android:versionName="1.0.0" >
 6
@@ -30,11 +30,11 @@
 25        android:debuggable="true"
 26        android:icon="@mipmap/ic_launcher"
 26-->/Users/baqir/Sites/fluttertraining/android/app/src/main/AndroidManifest.xml:11:9-43
-27        android:label="weather_app" >
-27-->/Users/baqir/Sites/fluttertraining/android/app/src/main/AndroidManifest.xml:10:9-36
+27        android:label="favourites_app" >
+27-->/Users/baqir/Sites/fluttertraining/android/app/src/main/AndroidManifest.xml:10:9-39
 28        <activity
 28-->/Users/baqir/Sites/fluttertraining/android/app/src/main/AndroidManifest.xml:12:9-23:20
-29            android:name="com.example.weather_app.MainActivity"
+29            android:name="com.example.favourites_app.MainActivity"
 29-->/Users/baqir/Sites/fluttertraining/android/app/src/main/AndroidManifest.xml:13:13-41
 30            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
 30-->/Users/baqir/Sites/fluttertraining/android/app/src/main/AndroidManifest.xml:16:13-163
