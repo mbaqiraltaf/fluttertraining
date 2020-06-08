@@ -1,38 +1,42 @@
 import 'package:flutter/material.dart';
-import 'models/weatherresponse.dart';
-import 'models/coordinates.dart';
-import 'models/temperature.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'widgets/weatherdetails.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'models/Suggestion.dart';
+import 'widgets/SuggestionsList.dart';
+import 'dart:core';
+import 'dart:math';
+import 'pages/FavouritesPage.dart';
 import 'constants.dart' as Constants;
+import 'package:random_string/random_string.dart';
 
 void main() => runApp(MyApp());
 
-Future<WeatherResponse> fetchWeather(String cityName) async {
-  final response = await http.get(
-      'http://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=a7b7f4efaa2172a1026a06259f08da86&units=metric');
-
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    Map<String, dynamic> jsonMap = json.decode(response.body);
-    Coordinates coordinates = Coordinates.fromJson(jsonMap['coord']);
-    Temperature temperatureInfo = Temperature.fromJson(jsonMap['main']);
-    return WeatherResponse.fromJson(coordinates, temperatureInfo);
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load weather');
-  }
-}
-
 class MyApp extends StatelessWidget {
+  Future<Database> openConnection() async {
+    return openDatabase(
+        join(await getDatabasesPath(), 'suggestions_database_22.db'),
+        version: 1, onCreate: (db, version) {
+      db.execute(
+          "CREATE TABLE suggestions(id INTEGER PRIMARY KEY, name TEXT, isFavourite INTEGER)");
+      List<String> recordsToSeed = [];
+
+      Constants.suggestions.forEach((item) {
+        String suggestionName = randomAlphaNumeric(Constants.nameLength);
+        int isFavourite = item['isFavourite'];
+        int id = item['id'];
+        recordsToSeed.add("($id, '$suggestionName', $isFavourite)");
+      });
+
+      db.execute(
+          "INSERT INTO suggestions (id, name, isFavourite) VALUES ${recordsToSeed.join(', ')}");
+    });
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Weather App',
+      title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -45,13 +49,21 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Weather App'),
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => MyHomePage(
+            title: 'Flutter Demo Home Page', openConnection: openConnection),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/favourites': (context) =>
+            FavouritesPage(openConnection: openConnection),
+      },
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title, this.openConnection}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -63,112 +75,130 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  final Function openConnection;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<WeatherResponse> futureWeather;
-  String dropdownValue = Constants.defaultCity;
+  List<Widget> dogsList = List<Widget>();
 
-  @override
-  void initState() {
-    super.initState();
-    futureWeather = fetchWeather(Constants.defaultCity);
+  // Define a function that inserts dogs into the database
+  Future<void> insertSuggestion(Suggestion suggestion) async {
+    // Get a reference to the database.
+    final Database db = await this.widget.openConnection();
+
+    // Insert the Dog into the correct table. You might also specify the
+    // `conflictAlgorithm` to use in case the same dog is inserted twice.
+    //
+    // In this case, replace any previous data.
+    await db.insert(
+      'dogs',
+      suggestion.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // A method that retrieves all the dogs from the dogs table.
+  Future<List<Suggestion>> getSuggestions({whereClause, whereArgs}) async {
+    // Get a reference to the database.
+    final Database db = await this.widget.openConnection();
+
+    // Query the table for all The Dogs.
+    final List<Map<String, dynamic>> maps =
+        await db.query('suggestions', where: whereClause, whereArgs: whereArgs);
+
+    // Convert the List<Map<String, dynamic> into a List<Dog>.
+    return List.generate(maps.length, (i) {
+      return Suggestion(
+        id: maps[i]['id'],
+        name: maps[i]['name'],
+        isFavourite: maps[i]['isFavourite'],
+      );
+    });
+  }
+
+  Future<void> updateSuggestion(Suggestion suggestion) async {
+    // Get a reference to the database.
+    final db = await this.widget.openConnection();
+
+    // Update the given Dog.
+    await db.update(
+      'suggestions',
+      suggestion.toMap(),
+      // Ensure that the Dog has a matching id.
+      where: "id = ?",
+      // Pass the Dog's id as a whereArg to prevent SQL injection.
+      whereArgs: [suggestion.id],
+    );
+
+    setState(() {});
+  }
+
+  Future<void> deleteSuggestion(int id) async {
+    // Get a reference to the database.
+    final db = await this.widget.openConnection();
+
+    // Remove the Dog from the Database.
+    await db.delete(
+      'suggestions',
+      // Use a `where` clause to delete a specific dog.
+      where: "id = ?",
+      // Pass the Dog's id as a whereArg to prevent SQL injection.
+      whereArgs: [id],
+    );
+
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+      drawer: Drawer(
+        // Add a ListView to the drawer. This ensures the user can scroll
+        // through the options in the drawer if there isn't enough vertical
+        // space to fit everything.
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
           children: <Widget>[
-            FutureBuilder<WeatherResponse>(
-              future: futureWeather,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return WeatherDetails(
-                      tempInfo: snapshot.data.temperatureInfo);
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-
-                // By default, show a loading spinner.
-                return CircularProgressIndicator();
+            DrawerHeader(
+              child: Text('Drawer Header'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Favourites'),
+              onTap: () {
+                Navigator.pushNamed(context, '/favourites');
               },
             ),
-            DropdownButton<String>(
-              value: dropdownValue,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.deepPurple, fontSize: 20.0),
-              underline: Container(
-                height: 2,
-                color: Colors.deepPurpleAccent,
-              ),
-              onChanged: (String newValue) {
-                setState(() {
-                  dropdownValue = newValue;
-                });
-              },
-              items: Constants.cities
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            FlatButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              disabledColor: Colors.grey,
-              disabledTextColor: Colors.black,
-              padding: EdgeInsets.all(8.0),
-              splashColor: Colors.blueAccent,
-              onPressed: () {
-                setState(() {
-                  futureWeather = fetchWeather(dropdownValue);
-                });
-              },
-              child: Text(
-                "Fetch Temperature",
-                style: TextStyle(fontSize: 20.0),
-              ),
-            )
           ],
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+      appBar: AppBar(title: Text("Favourites App")),
+      body: Container(
+        child: Center(
+          child: FutureBuilder<List<Suggestion>>(
+            future:
+                getSuggestions(), // a previously-obtained Future<String> or null
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return SuggestionsList(
+                    suggestions: snapshot.data,
+                    updateSuggestion: updateSuggestion);
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+
+              // By default, show a loading spinner.
+              return CircularProgressIndicator();
+            },
+          ),
+        ),
+      ),
     );
   }
 }
