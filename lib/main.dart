@@ -14,14 +14,14 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   Future<Database> openConnection() async {
     return openDatabase(
-        join(await getDatabasesPath(), 'suggestions_database_21.db'),
+        join(await getDatabasesPath(), 'suggestions_database_23.db'),
         version: 1, onCreate: (db, version) {
       db.execute(
           "CREATE TABLE suggestions(id INTEGER PRIMARY KEY, name TEXT, isFavourite INTEGER)");
       List<String> recordsToSeed = [];
 
       Constants.suggestions.forEach((item) {
-        String suggestionName = randomAlphaNumeric(Constants.nameLength);
+        String suggestionName = item['name'];
         int isFavourite = item['isFavourite'];
         int id = item['id'];
         recordsToSeed.add("($id, '$suggestionName', $isFavourite)");
