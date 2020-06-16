@@ -1,4 +1,4 @@
-com.example.weather_app
+com.example.weather_app_with_flutterbloc
 attr alpha
 attr coordinatorLayoutStyle
 attr font

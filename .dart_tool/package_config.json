@@ -20,6 +20,12 @@
       "languageVersion": "2.0"
     },
     {
+      "name": "bloc",
+      "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/bloc-4.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.6"
+    },
+    {
       "name": "boolean_selector",
       "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/boolean_selector-1.0.5",
       "packageUri": "lib/",
@@ -56,10 +62,22 @@
       "languageVersion": "2.0"
     },
     {
+      "name": "equatable",
+      "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/equatable-1.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    },
+    {
       "name": "flutter",
       "rootUri": "file:///Users/baqir/flutter/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "2.2"
+    },
+    {
+      "name": "flutter_bloc",
+      "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_bloc-4.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.6"
     },
     {
       "name": "flutter_test",
@@ -98,10 +116,10 @@
       "languageVersion": "1.12"
     },
     {
-      "name": "mockito",
-      "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/mockito-4.1.1",
+      "name": "nested",
+      "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/nested-0.0.4",
       "packageUri": "lib/",
-      "languageVersion": "2.0"
+      "languageVersion": "2.2"
     },
     {
       "name": "path",
@@ -120,6 +138,12 @@
       "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/petitparser-2.4.0",
       "packageUri": "lib/",
       "languageVersion": "2.4"
+    },
+    {
+      "name": "provider",
+      "rootUri": "file:///Users/baqir/flutter/.pub-cache/hosted/pub.dartlang.org/provider-4.0.5+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.2"
     },
     {
       "name": "quiver",
@@ -188,13 +212,13 @@
       "languageVersion": "2.3"
     },
     {
-      "name": "weather_app",
+      "name": "weather_app_with_flutterbloc",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.1"
     }
   ],
-  "generated": "2020-06-09T07:04:48.665594Z",
+  "generated": "2020-06-16T05:37:09.778442Z",
   "generator": "pub",
   "generatorVersion": "2.7.2"
 }

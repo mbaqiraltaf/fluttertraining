@@ -1,66 +1,38 @@
 import 'package:flutter/material.dart';
-import 'album.dart';
-import 'models/weatherresponse.dart';
-import 'models/coordinates.dart';
-import 'models/temperature.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import './simple_bloc_delegate.dart';
+import './repositories/repositories.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'widgets/weatherdetails.dart';
-import 'constants.dart' as Constants;
+import './blocs/blocs.dart';
+import './widgets/widgets.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  BlocSupervisor.delegate = SimpleBlocDelegate();
 
-Future<Album> fetchAlbum() async {
-  final response =
-      await http.get('http://jsonplaceholder.typicode.com/albums/1');
+  final WeatherRepository weatherRepository = WeatherRepository(
+    weatherApiClient: WeatherApiClient(
+      httpClient: http.Client(),
+    ),
+  );
 
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return Album.fromJson(json.decode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
-}
-
-Future<WeatherResponse> fetchWeather(String cityName, http.Client client) async {
-  final response = await client.get(
-      'http://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=a7b7f4efaa2172a1026a06259f08da86&units=metric');
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    Map<String, dynamic> jsonMap = json.decode(response.body);
-    Coordinates coordinates = Coordinates.fromJson(jsonMap['coord']);
-    Temperature temperatureInfo = Temperature.fromJson(jsonMap['main']);
-    return WeatherResponse.fromJson(coordinates, temperatureInfo);
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load weather');
-  }
+  runApp(MyApp(weatherRepository: weatherRepository));
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final WeatherRepository weatherRepository;
+
+  MyApp({Key key, @required this.weatherRepository})
+      : assert(weatherRepository != null),
+        super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Weather App',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+      title: 'Flutter Weather',
+      home: BlocProvider(
+        create: (context) => WeatherBloc(weatherRepository: weatherRepository),
+        child: Weather(),
       ),
-      home: MyHomePage(title: 'Weather App'),
     );
   }
 }
@@ -73,7 +45,7 @@ class MyHomePage extends StatefulWidget {
   // how it looks.
 
   // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
+  // case the title) provided by the parent (in this case the MyApp widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
@@ -84,15 +56,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  //Future<Album> futureAlbum;
-  Future<WeatherResponse> futureWeather;
-  String dropdownValue = Constants.defaultCity;
+  int _counter = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    //futureAlbum = fetchAlbum();
-    futureWeather = fetchWeather(Constants.defaultCity, http.Client());
+  void _incrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter++;
+    });
   }
 
   @override
@@ -106,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
+        // the MyApp.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
@@ -129,63 +103,20 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FutureBuilder<WeatherResponse>(
-              //future: futureAlbum,
-              future: futureWeather,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return WeatherDetails(
-                      tempInfo: snapshot.data.temperatureInfo);
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-
-                // By default, show a loading spinner.
-                return CircularProgressIndicator();
-              },
+            Text(
+              'You have pushed the button this many times:',
             ),
-            DropdownButton<String>(
-              value: dropdownValue,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.deepPurple, fontSize: 20.0),
-              underline: Container(
-                height: 2,
-                color: Colors.deepPurpleAccent,
-              ),
-              onChanged: (String newValue) {
-                setState(() {
-                  dropdownValue = newValue;
-                });
-              },
-              items: Constants.cities
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.display1,
             ),
-            FlatButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              disabledColor: Colors.grey,
-              disabledTextColor: Colors.black,
-              padding: EdgeInsets.all(8.0),
-              splashColor: Colors.blueAccent,
-              onPressed: () {
-                setState(() {
-                  futureWeather = fetchWeather(dropdownValue, http.Client());
-                });
-              },
-              child: Text(
-                "Fetch Temperature",
-                style: TextStyle(fontSize: 20.0),
-              ),
-            )
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
